@@ -45,6 +45,7 @@ import org.netbeans.api.lexer.InputAttributes;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.queries.FileEncodingQuery;
 import org.netbeans.modules.java.preprocessorbridge.spi.JavaFileFilterImplementation;
+import org.netbeans.modules.java.source.base.SourceLevelUtils;
 import org.netbeans.modules.parsing.api.Source;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
@@ -303,11 +304,12 @@ public abstract class AbstractSourceFileObject implements PrefetchableJavaFileOb
             final CharBuffer charBuffer = getCharContent(true);
             InputAttributes attrs = new InputAttributes();
             attrs.setValue(JavaTokenId.language(), "fileName", (Supplier<String>) () -> getName(), true); //NOI18N            
+            attrs.setValue(JavaTokenId.language(), "version", getVersion(), true); //NOI18N            
             this.tokens = TokenHierarchy.create(charBuffer, false, JavaTokenId.language(), null, attrs); //TODO: .createSnapshot();
         }
         return this.tokens;
     }
-
+    
     public final void update () throws IOException {
         if (this.kind != Kind.CLASS) {
             //Side effect assigns the text
@@ -400,6 +402,10 @@ public abstract class AbstractSourceFileObject implements PrefetchableJavaFileOb
         }
         return file.lastModified().getTime();
     }
+    
+    private Integer getVersion() {
+        return SourceLevelUtils.lookupJDKIntVersion();
+    }    
 
     //Static methods
     @NonNull

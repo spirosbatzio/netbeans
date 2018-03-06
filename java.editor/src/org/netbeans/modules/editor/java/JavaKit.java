@@ -21,8 +21,10 @@ package org.netbeans.modules.editor.java;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import javax.swing.Action;
 import javax.swing.JEditorPane;
@@ -85,6 +87,7 @@ public class JavaKit extends NbEditorKit {
     private static final boolean INSTANT = Boolean.getBoolean("org.netbeans.modules.java.refactoring.instantRename");
 
 //    private static final Object sourceLevelKey = new Object();
+    private static final Map<String, Integer> versionMap = new HashMap<String, Integer> ();
 
     public JavaKit(){
     }
@@ -146,6 +149,7 @@ public class JavaKit extends NbEditorKit {
             FileObject fo = NbEditorUtilities.getFileObject(doc);
             return fo != null ? fo.getNameExt() : null;
         }, true);
+        attrs.setValue(JavaTokenId.language(), "version", lookupVersion(), true); //NOI18N
         doc.putProperty(InputAttributes.class, attrs);
       }
     
@@ -271,6 +275,29 @@ public class JavaKit extends NbEditorKit {
     public void install(JEditorPane c) {
         super.install(c);
         ClipboardHandler.install(c);
+    }
+    
+    //returns Integer value for JDK version, e.g. 8, 9, 10 etc
+    private Integer lookupVersion() {
+        Integer ver = null;
+        populateVersionMap();
+        String version = System.getProperty("java.vm.specification.version");
+        if ((version != null) && Character.isDigit(version.charAt(0))) {
+            ver = versionMap.get(version);
+        }
+        return ver;
+    }
+
+    private static void populateVersionMap() {
+        if (versionMap.isEmpty()) {
+            versionMap.put("1.4", 4);
+            versionMap.put("1.5", 5);
+            versionMap.put("1.6", 6);
+            versionMap.put("1.7", 7);
+            versionMap.put("1.8", 8);
+            versionMap.put("1.9", 9);
+            versionMap.put("10", 10);
+        }
     }
 
     @EditorActionRegistration(name = generateGoToPopupAction, mimeType = JAVA_MIME_TYPE)
