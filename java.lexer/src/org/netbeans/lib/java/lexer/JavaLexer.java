@@ -75,7 +75,7 @@ public class JavaLexer implements Lexer<JavaTokenId> {
         String verAttr = (String) info.getAttributeValue("version"); //NOI18N 
         Integer ver = null;
         if (verAttr != null) {
-            ver = (Integer) getVersionAsInt(verAttr);
+            ver = getVersionAsInt(verAttr);
         }
         this.version = (ver != null) ? ver.intValue() : 10; // TODO: Java 1.8 used by default        
     }
@@ -1310,6 +1310,9 @@ public class JavaLexer implements Lexer<JavaTokenId> {
         populateVersionMap();
         if ((version != null) && Character.isDigit(version.charAt(0))) {
             ver = versionMap.get(version);
+            if((ver == null) && (version.matches("\\d+"))){
+               ver = Integer.parseInt(version);
+            }
         }
         return ver;
     }
@@ -1322,6 +1325,7 @@ public class JavaLexer implements Lexer<JavaTokenId> {
             versionMap.put("1.7", 7);
             versionMap.put("1.8", 8);
             versionMap.put("1.9", 9);
+            versionMap.put("9", 9);
             versionMap.put("10", 10);
         }
     }   

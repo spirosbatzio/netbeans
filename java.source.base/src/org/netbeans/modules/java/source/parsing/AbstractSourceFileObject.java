@@ -45,7 +45,6 @@ import org.netbeans.api.lexer.InputAttributes;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.queries.FileEncodingQuery;
 import org.netbeans.modules.java.preprocessorbridge.spi.JavaFileFilterImplementation;
-import org.netbeans.modules.java.source.base.SourceLevelUtils;
 import org.netbeans.modules.parsing.api.Source;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
