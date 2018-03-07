@@ -20,6 +20,8 @@
 package org.netbeans.lib.java.lexer;
 
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 import org.netbeans.api.java.lexer.JavaTokenId;
@@ -33,8 +35,8 @@ import org.netbeans.spi.lexer.TokenFactory;
 /**
  * Lexical analyzer for java language.
  * <br/>
- * It recognizes "version" attribute and expects <code>java.lang.Integer</code>
- * value for it. The default value is Integer.valueOf(5). The lexer changes
+ * It recognizes "version" attribute and uses <code>java.lang.Integer</code>
+ * value for it. The default value is highest JDK version supported. The lexer changes
  * its behavior in the following way:
  * <ul>
  *     <li> Integer.valueOf(4) - "assert" recognized as keyword (not identifier)
@@ -56,6 +58,8 @@ public class JavaLexer implements Lexer<JavaTokenId> {
     private final int version;
     
     private Integer state = null;
+    
+    private static final Map<String, Integer> versionMap = new HashMap<String, Integer> ();
 
     public JavaLexer(LexerRestartInfo<JavaTokenId> info) {
         this.input = info.input();
@@ -68,7 +72,11 @@ public class JavaLexer implements Lexer<JavaTokenId> {
             }
         }
         
-        Integer ver = (Integer)info.getAttributeValue("version"); //NOI18N
+        String verAttr = (String) info.getAttributeValue("version"); //NOI18N 
+        Integer ver = null;
+        if (verAttr != null) {
+            ver = (Integer) getVersionAsInt(verAttr);
+        }
         this.version = (ver != null) ? ver.intValue() : 10; // TODO: Java 1.8 used by default        
     }
     
@@ -1296,6 +1304,27 @@ public class JavaLexer implements Lexer<JavaTokenId> {
             JavaTokenId.BLOCK_COMMENT, JavaTokenId.JAVADOC_COMMENT,
             JavaTokenId.LINE_COMMENT, JavaTokenId.WHITESPACE
     );
+    
+    private Integer getVersionAsInt(String version) {
+        Integer ver = null;
+        populateVersionMap();
+        if ((version != null) && Character.isDigit(version.charAt(0))) {
+            ver = versionMap.get(version);
+        }
+        return ver;
+    }
+    
+    private static void populateVersionMap() {
+        if (versionMap.isEmpty()) {
+            versionMap.put("1.4", 4);
+            versionMap.put("1.5", 5);
+            versionMap.put("1.6", 6);
+            versionMap.put("1.7", 7);
+            versionMap.put("1.8", 8);
+            versionMap.put("1.9", 9);
+            versionMap.put("10", 10);
+        }
+    }   
 
     public void release() {
     }

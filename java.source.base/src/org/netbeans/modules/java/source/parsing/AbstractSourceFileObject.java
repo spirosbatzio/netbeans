@@ -309,7 +309,7 @@ public abstract class AbstractSourceFileObject implements PrefetchableJavaFileOb
         }
         return this.tokens;
     }
-    
+
     public final void update () throws IOException {
         if (this.kind != Kind.CLASS) {
             //Side effect assigns the text
@@ -403,8 +403,8 @@ public abstract class AbstractSourceFileObject implements PrefetchableJavaFileOb
         return file.lastModified().getTime();
     }
     
-    private Integer getVersion() {
-        return SourceLevelUtils.lookupJDKIntVersion();
+    private String getVersion() {
+        return System.getProperty("java.vm.specification.version");
     }    
 
     //Static methods
