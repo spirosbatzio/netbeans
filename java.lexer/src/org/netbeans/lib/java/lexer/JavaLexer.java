@@ -59,8 +59,6 @@ public class JavaLexer implements Lexer<JavaTokenId> {
     
     private Integer state = null;
     
-    private static final Map<String, Integer> versionMap = new HashMap<String, Integer> ();
-
     public JavaLexer(LexerRestartInfo<JavaTokenId> info) {
         this.input = info.input();
         this.tokenFactory = info.tokenFactory();
@@ -72,10 +70,15 @@ public class JavaLexer implements Lexer<JavaTokenId> {
             }
         }
         
-        String verAttr = (String) info.getAttributeValue("version"); //NOI18N 
         Integer ver = null;
-        if (verAttr != null) {
-            ver = getVersionAsInt(verAttr);
+        Object verAttribute = info.getAttributeValue("version"); //NOI18N 
+        if (verAttribute instanceof Supplier) {
+            Object val = ((Supplier) verAttribute).get();
+            if (val instanceof String) {
+                ver = getVersionAsInt(((Supplier<String>) (verAttribute)).get());
+            }
+        } else if (verAttribute instanceof Integer) {
+            ver = (Integer) verAttribute;
         }
         this.version = (ver != null) ? ver.intValue() : 10; // TODO: Java 1.8 used by default        
     }
@@ -1307,28 +1310,17 @@ public class JavaLexer implements Lexer<JavaTokenId> {
     
     private Integer getVersionAsInt(String version) {
         Integer ver = null;
-        populateVersionMap();
-        if ((version != null) && Character.isDigit(version.charAt(0))) {
-            ver = versionMap.get(version);
-            if((ver == null) && (version.matches("\\d+"))){
-               ver = Integer.parseInt(version);
+        if (version != null) {
+            // version attribute is set using SourceLevelQuery,
+            // which returns values in format 1.x or x
+            if (version.startsWith("1.")) { //NOI18N
+                ver = Integer.parseInt(version.substring(version.indexOf(".") + 1)); //NOI18N
+            } else {
+                ver = Integer.parseInt(version);
             }
         }
         return ver;
     }
-    
-    private static void populateVersionMap() {
-        if (versionMap.isEmpty()) {
-            versionMap.put("1.4", 4);
-            versionMap.put("1.5", 5);
-            versionMap.put("1.6", 6);
-            versionMap.put("1.7", 7);
-            versionMap.put("1.8", 8);
-            versionMap.put("1.9", 9);
-            versionMap.put("9", 9);
-            versionMap.put("10", 10);
-        }
-    }   
 
     public void release() {
     }

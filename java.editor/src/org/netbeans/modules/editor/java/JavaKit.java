@@ -146,7 +146,10 @@ public class JavaKit extends NbEditorKit {
             FileObject fo = NbEditorUtilities.getFileObject(doc);
             return fo != null ? fo.getNameExt() : null;
         }, true);
-        attrs.setValue(JavaTokenId.language(), "version", getVersion(), true); //NOI18N
+        attrs.setValue(JavaTokenId.language(), "version", (Supplier<String>) () -> { //NOI18N
+            FileObject fo = NbEditorUtilities.getFileObject(doc);
+            return (fo != null) ? SourceLevelQuery.getSourceLevel(fo) : null;
+        }, true);
         doc.putProperty(InputAttributes.class, attrs);
       }
     
@@ -274,10 +277,6 @@ public class JavaKit extends NbEditorKit {
         ClipboardHandler.install(c);
     }
     
-    private String getVersion() {
-        return System.getProperty("java.vm.specification.version");        
-    }   
-
     @EditorActionRegistration(name = generateGoToPopupAction, mimeType = JAVA_MIME_TYPE)
     public static class JavaGenerateGoToPopupAction extends NbGenerateGoToPopupAction {
 
