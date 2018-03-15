@@ -35,8 +35,8 @@ import org.netbeans.spi.lexer.TokenFactory;
 /**
  * Lexical analyzer for java language.
  * <br/>
- * It recognizes "version" attribute and uses <code>java.lang.Integer</code>
- * value for it. The default value is highest JDK version supported. The lexer changes
+ * It recognizes "version" attribute and expects <code>java.lang.Integer</code>
+ * value for it. The default value is Integer.valueOf(5). The lexer changes
  * its behavior in the following way:
  * <ul>
  *     <li> Integer.valueOf(4) - "assert" recognized as keyword (not identifier)
@@ -1311,11 +1311,10 @@ public class JavaLexer implements Lexer<JavaTokenId> {
     private Integer getVersionAsInt(String version) {
         Integer ver = null;
         if (version != null) {
-            // version attribute is set using SourceLevelQuery,
-            // which returns values in format 1.x or x
-            if (version.startsWith("1.")) { //NOI18N
+            // expect java version string format 1.x or x
+            if (version.matches("[1][.][5-8]")) { //NOI18N
                 ver = Integer.parseInt(version.substring(version.indexOf(".") + 1)); //NOI18N
-            } else {
+            } else if (version.matches("[1-9][0-9]?")) {
                 ver = Integer.parseInt(version);
             }
         }
