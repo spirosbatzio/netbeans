@@ -13,7 +13,7 @@ public class MethodProposals {
     private List<? super String> lsup;
     private List<?> lub;
 
-    public boolean addAll(Collection<? extends String> clctn) {
-        return lsup.addAll(clctn);
+    public boolean addAll(Collection<? extends String> arg0) {
+        return lsup.addAll(arg0);
     }
 }

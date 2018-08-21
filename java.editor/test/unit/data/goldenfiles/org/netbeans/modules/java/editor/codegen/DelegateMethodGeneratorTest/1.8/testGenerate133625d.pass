@@ -12,7 +12,7 @@ public class MethodProposals {
     private List<? super String> lsup;
     private List<?> lub;
 
-    public boolean add(Object e) {
-        return lub.add(e);
+    public boolean add(Object arg0) {
+        return lub.add(arg0);
     }
 }
