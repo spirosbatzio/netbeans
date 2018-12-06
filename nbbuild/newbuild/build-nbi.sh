@@ -32,6 +32,10 @@ if [ -z $BUILD_NBJDK8 ]; then
     BUILD_NBJDK8=0
 fi
 
+if [ -z $BUILD_NBJDK11 ]; then
+    BUILD_NBJDK11=0
+fi
+
 OUTPUT_DIR="$DIST/installers"
 export OUTPUT_DIR
 
@@ -57,7 +61,7 @@ if [ ! -z $NATIVE_MAC_MACHINE ] && [ ! -z $MAC_PATH ]; then
        exit $ERROR_CODE;
    fi
    ssh $NATIVE_MAC_MACHINE mkdir -p $MAC_PATH/zip/moduleclusters
-   ls $DIST/zip/moduleclusters | grep -v "all-in-one" | xargs -I {} scp -q -v $DIST/zip/moduleclusters/{} $NATIVE_MAC_MACHINE:$MAC_PATH/zip/moduleclusters/
+   ls $DIST/zip/moduleclusters | xargs -I {} scp -q -v $DIST/zip/moduleclusters/{} $NATIVE_MAC_MACHINE:$MAC_PATH/zip/moduleclusters/
 
    ERROR_CODE=$?
    if [ $ERROR_CODE != 0 ]; then
@@ -69,13 +73,7 @@ if [ ! -z $NATIVE_MAC_MACHINE ] && [ ! -z $MAC_PATH ]; then
    sh $NB_ALL/installer/mac/newbuild/init.sh | ssh $NATIVE_MAC_MACHINE "cat > $MAC_PATH/installer/mac/newbuild/build-private.sh"
    ssh $NATIVE_MAC_MACHINE chmod a+x $MAC_PATH/installer/mac/newbuild/build.sh
 
-   if [ ! -z $SIGNING_PASSWORD ] ; then
-       UNLOCK_COMMAND="security unlock-keychain -p $SIGNING_PASSWORD ;"
-   else
-       SIGNING_IDENTITY=0
-   fi
-
-   BASE_COMMAND="$MAC_PATH/installer/mac/newbuild/build.sh $MAC_PATH $BASENAME_PREFIX $BUILDNUMBER $BUILD_NBJDK7 $BUILD_NBJDK8 '"$SIGNING_IDENTITY"' $LOCALES"
+   BASE_COMMAND="$MAC_PATH/installer/mac/newbuild/build.sh $MAC_PATH $BASENAME_PREFIX $BUILDNUMBER $BUILD_NBJDK7 $BUILD_NBJDK8 $BUILD_NBJDK11 $MAC_SIGN_CLIENT $MAC_SIGN_USER $MAC_SIGN_GUID $CODESIGNBUREAU_CREDFILE $LOCALES"
    
    ssh $NATIVE_MAC_MACHINE "$UNLOCK_COMMAND $BASE_COMMAND" > $MAC_LOG_NEW 2>&1 &
    REMOTE_MAC_PID=$!
