@@ -70,10 +70,10 @@ if [ ! -z $NATIVE_MAC_MACHINE ] && [ ! -z $MAC_PATH ]; then
    fi
 
    # Run new builds
-   sh $NB_ALL/nbbuild/installer/mac/newbuild/init.sh | ssh $NATIVE_MAC_MACHINE "cat > $MAC_PATH/installer/mac/newbuild/build-private.sh"
-   ssh $NATIVE_MAC_MACHINE chmod a+x $MAC_PATH/installer/mac/newbuild/build.sh
+   sh $NB_ALL/nbbuild/installer/mac/newbuild/init.sh | ssh $NATIVE_MAC_MACHINE "cat > $MAC_PATH/nbbuild/installer/mac/newbuild/build-private.sh"
+   ssh $NATIVE_MAC_MACHINE chmod a+x $MAC_PATH/nbbuild/installer/mac/newbuild/build.sh
 
-   BASE_COMMAND="$MAC_PATH/installer/mac/newbuild/build.sh $MAC_PATH $BASENAME_PREFIX $BUILDNUMBER $BUILD_NBJDK7 $BUILD_NBJDK8 $BUILD_NBJDK11 $MAC_SIGN_CLIENT $MAC_SIGN_USER $MAC_SIGN_GUID $CODESIGNBUREAU_CREDFILE $LOCALES"
+   BASE_COMMAND="$MAC_PATH/nbbuild/installer/mac/newbuild/build.sh $MAC_PATH $BASENAME_PREFIX $BUILDNUMBER $BUILD_NBJDK7 $BUILD_NBJDK8 $BUILD_NBJDK11 $MAC_SIGN_CLIENT $MAC_SIGN_USER $MAC_SIGN_GUID $CODESIGNBUREAU_CREDFILE $LOCALES"
    
    ssh $NATIVE_MAC_MACHINE "$UNLOCK_COMMAND $BASE_COMMAND" > $MAC_LOG_NEW 2>&1 &
    REMOTE_MAC_PID=$!
@@ -122,7 +122,7 @@ if [ ! -z $NATIVE_MAC_MACHINE ] && [ ! -z $MAC_PATH ]; then
         #copy the bits back
         mkdir -p $DIST/bundles
 
-        rsync -avz -e ssh $NATIVE_MAC_MACHINE:$MAC_PATH/installer/mac/newbuild/dist_en/* $DIST/bundles
+        rsync -avz -e ssh $NATIVE_MAC_MACHINE:$MAC_PATH/nbbuild/installer/mac/newbuild/dist_en/* $DIST/bundles
         ERROR_CODE=$?
         if [ $ERROR_CODE != 0 ]; then
             echo "ERROR: $ERROR_CODE - Connection to MAC machine $NATIVE_MAC_MACHINE failed, can't get installers"
